@@ -1,6 +1,6 @@
 import type { OrderResponse, RegisterOrderRequest, UpdateOrderStatusRequest } from "../types";
 
-const baseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
+const baseUrl = import.meta.env.VITE_API_BASE_URL || "";
 const apiUser = import.meta.env.VITE_API_USER || "api-user";
 const apiPassword = import.meta.env.VITE_API_PASSWORD || "change-me";
 
@@ -10,7 +10,8 @@ const defaultHeaders: HeadersInit = {
 };
 
 async function request<T>(path: string, init: RequestInit): Promise<T> {
-  const response = await fetch(`${baseUrl}${path}`, init);
+  const url = baseUrl ? `${baseUrl}${path}` : path;
+  const response = await fetch(url, init);
   if (!response.ok) {
     const text = await response.text();
     const message = text || response.statusText;
