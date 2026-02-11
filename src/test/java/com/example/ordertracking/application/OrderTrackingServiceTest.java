@@ -4,6 +4,7 @@ import com.example.ordertracking.application.port.out.LoadOrderPort;
 import com.example.ordertracking.application.port.out.LoadStaleOrdersPort;
 import com.example.ordertracking.application.port.out.PublishOrderEventPort;
 import com.example.ordertracking.application.port.out.SaveOrderPort;
+import com.example.ordertracking.application.port.out.SearchOrdersPort;
 import com.example.ordertracking.application.service.OrderTrackingService;
 import com.example.ordertracking.domain.model.Order;
 import com.example.ordertracking.domain.model.OrderStatus;
@@ -34,12 +35,20 @@ class OrderTrackingServiceTest {
     private PublishOrderEventPort publishOrderEventPort;
     @Mock
     private LoadStaleOrdersPort loadStaleOrdersPort;
+    @Mock
+    private SearchOrdersPort searchOrdersPort;
 
     private OrderTrackingService service;
 
     @BeforeEach
     void setUp() {
-        service = new OrderTrackingService(loadOrderPort, saveOrderPort, publishOrderEventPort, loadStaleOrdersPort);
+        service = new OrderTrackingService(
+                loadOrderPort,
+                saveOrderPort,
+                publishOrderEventPort,
+                loadStaleOrdersPort,
+                searchOrdersPort
+        );
     }
 
 
