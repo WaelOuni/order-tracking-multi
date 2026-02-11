@@ -1,0 +1,26 @@
+# Maven
+/target/
+!.mvn/wrapper/maven-wrapper.jar
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Env
+.env
+.env.*
+
+# Spring Boot
+spring.log
+
+# Test artifacts
+surefire-reports/

@@ -1,0 +1,27 @@
+spring:
+  application:
+    name: order-tracking
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/order_tracking
+  kafka:
+    bootstrap-servers: localhost:9092
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus,metrics
+  metrics:
+    tags:
+      application: ${spring.application.name}
+
+logging:
+  level:
+    com.example.ordertracking: INFO
+
+app:
+  kafka:
+    order-status-topic: order.status.changed
+  jobs:
+    stale-order-completion-cron: "0 0/30 * * * *"
