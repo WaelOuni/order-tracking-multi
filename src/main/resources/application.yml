@@ -3,9 +3,22 @@ spring:
     name: order-tracking
   data:
     mongodb:
-      uri: mongodb://localhost:27017/order_tracking
+      uri: ${MONGODB_URI:mongodb://localhost:27017/order_tracking}
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    client-id: ${KAFKA_CLIENT_ID:order-tracking}
+    properties:
+      security.protocol: ${KAFKA_SECURITY_PROTOCOL:SASL_SSL}
+      sasl.mechanism: ${KAFKA_SASL_MECHANISM:PLAIN}
+      sasl.jaas.config: ${KAFKA_SASL_JAAS_CONFIG:}
+      client.dns.lookup: ${KAFKA_CLIENT_DNS_LOOKUP:use_all_dns_ips}
+      session.timeout.ms: ${KAFKA_SESSION_TIMEOUT_MS:45000}
+    producer:
+      acks: ${KAFKA_ACKS:all}
+
+springdoc:
+  swagger-ui:
+    enabled: false
 
 management:
   endpoints:
@@ -21,6 +34,12 @@ logging:
     com.example.ordertracking: INFO
 
 app:
+  cors:
+    allowed-origins: ${APP_CORS_ALLOWED_ORIGINS:http://localhost:5173,http://127.0.0.1:5173}
+  security:
+    user:
+      name: ${APP_SECURITY_USER:api-user}
+      password: ${APP_SECURITY_PASSWORD:change-me}
   kafka:
     order-status-topic: order.status.changed
   jobs:

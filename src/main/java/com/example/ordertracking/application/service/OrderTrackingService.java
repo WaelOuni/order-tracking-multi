@@ -1,12 +1,15 @@
 package com.example.ordertracking.application.service;
 
+import com.example.ordertracking.application.port.in.ListOrdersUseCase;
 import com.example.ordertracking.application.port.in.RegisterOrderUseCase;
 import com.example.ordertracking.application.port.in.TrackOrderUseCase;
 import com.example.ordertracking.application.port.in.UpdateOrderStatusUseCase;
 import com.example.ordertracking.application.port.out.LoadOrderPort;
 import com.example.ordertracking.application.port.out.LoadStaleOrdersPort;
+import com.example.ordertracking.application.port.out.OrderSearchQuery;
 import com.example.ordertracking.application.port.out.PublishOrderEventPort;
 import com.example.ordertracking.application.port.out.SaveOrderPort;
+import com.example.ordertracking.application.port.out.SearchOrdersPort;
 import com.example.ordertracking.domain.model.Order;
 import com.example.ordertracking.domain.model.OrderStatus;
 import io.micrometer.observation.annotation.Observed;
@@ -18,21 +21,24 @@ import java.util.List;
 
 @Service
 @Observed(name = "order.tracking.service")
-public class OrderTrackingService implements RegisterOrderUseCase, TrackOrderUseCase, UpdateOrderStatusUseCase {
+public class OrderTrackingService implements RegisterOrderUseCase, TrackOrderUseCase, UpdateOrderStatusUseCase, ListOrdersUseCase {
 
     private final LoadOrderPort loadOrderPort;
     private final SaveOrderPort saveOrderPort;
     private final PublishOrderEventPort publishOrderEventPort;
     private final LoadStaleOrdersPort loadStaleOrdersPort;
+    private final SearchOrdersPort searchOrdersPort;
 
     public OrderTrackingService(LoadOrderPort loadOrderPort,
                                 SaveOrderPort saveOrderPort,
                                 PublishOrderEventPort publishOrderEventPort,
-                                LoadStaleOrdersPort loadStaleOrdersPort) {
+                                LoadStaleOrdersPort loadStaleOrdersPort,
+                                SearchOrdersPort searchOrdersPort) {
         this.loadOrderPort = loadOrderPort;
         this.saveOrderPort = saveOrderPort;
         this.publishOrderEventPort = publishOrderEventPort;
         this.loadStaleOrdersPort = loadStaleOrdersPort;
+        this.searchOrdersPort = searchOrdersPort;
     }
 
     @Override
@@ -59,6 +65,11 @@ public class OrderTrackingService implements RegisterOrderUseCase, TrackOrderUse
         Order saved = saveOrderPort.save(order);
         publishOrderEventPort.publishStatusChanged(saved);
         return saved;
+    }
+
+    @Override
+    public List<Order> listOrders(OrderSearchQuery query) {
+        return searchOrdersPort.findAll(query);
     }
 
     public int autoCompleteDeliveredForStaleShippedOrders() {
