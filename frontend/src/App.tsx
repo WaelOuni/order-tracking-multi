@@ -268,16 +268,18 @@ export default function App() {
             <p>Create a new order for a customer.</p>
           </header>
           <div className="field">
-            <label>Order ID</label>
+            <label htmlFor="register-order-id">Order ID</label>
             <input
+              id="register-order-id"
               value={registerOrderId}
               onChange={(event) => setRegisterOrderId(event.target.value)}
               placeholder="o-1001"
             />
           </div>
           <div className="field">
-            <label>Customer ID</label>
+            <label htmlFor="register-customer-id">Customer ID</label>
             <input
+              id="register-customer-id"
               value={registerCustomerId}
               onChange={(event) => setRegisterCustomerId(event.target.value)}
               placeholder="c-2001"
@@ -295,8 +297,9 @@ export default function App() {
             <p>Fetch the latest state of an order.</p>
           </header>
           <div className="field">
-            <label>Order ID</label>
+            <label htmlFor="track-order-id">Order ID</label>
             <input
+              id="track-order-id"
               value={trackOrderId}
               onChange={(event) => setTrackOrderId(event.target.value)}
               placeholder="o-1001"
@@ -314,16 +317,21 @@ export default function App() {
             <p>Move an order to the next valid state.</p>
           </header>
           <div className="field">
-            <label>Order ID</label>
+            <label htmlFor="update-order-id">Order ID</label>
             <input
+              id="update-order-id"
               value={updateOrderId}
               onChange={(event) => setUpdateOrderId(event.target.value)}
               placeholder="o-1001"
             />
           </div>
           <div className="field">
-            <label>Status</label>
-            <select value={updateStatus} onChange={(event) => setUpdateStatus(event.target.value as OrderStatus)}>
+            <label htmlFor="update-status">Status</label>
+            <select
+              id="update-status"
+              value={updateStatus}
+              onChange={(event) => setUpdateStatus(event.target.value as OrderStatus)}
+            >
               {STATUS_OPTIONS.map((status) => (
                 <option key={status} value={status}>
                   {status}
@@ -332,8 +340,9 @@ export default function App() {
             </select>
           </div>
           <div className="field">
-            <label>Note</label>
+            <label htmlFor="update-note">Note</label>
             <input
+              id="update-note"
               value={updateNote}
               onChange={(event) => setUpdateNote(event.target.value)}
               placeholder="Packed and handed to courier"
@@ -352,16 +361,21 @@ export default function App() {
           </header>
           <div className="action-controls">
             <div className="field">
-              <label>Filter by Order ID</label>
+              <label htmlFor="action-filter-order-id">Filter by Order ID</label>
               <input
+                id="action-filter-order-id"
                 value={filterOrderId}
                 onChange={(event) => setFilterOrderId(event.target.value)}
                 placeholder="o-1001"
               />
             </div>
             <div className="field">
-              <label>Action Type</label>
-              <select value={filterActionType} onChange={(event) => setFilterActionType(event.target.value)}>
+              <label htmlFor="action-filter-type">Action Type</label>
+              <select
+                id="action-filter-type"
+                value={filterActionType}
+                onChange={(event) => setFilterActionType(event.target.value)}
+              >
                 <option value="all">All</option>
                 <option value="created">Created</option>
                 <option value="tracked">Tracked</option>
@@ -419,24 +433,26 @@ export default function App() {
           </header>
           <div className="list-controls">
             <div className="field">
-              <label>Order ID</label>
+              <label htmlFor="list-order-id">Order ID</label>
               <input
+                id="list-order-id"
                 value={listOrderId}
                 onChange={(event) => setListOrderId(event.target.value)}
                 placeholder="o-1001"
               />
             </div>
             <div className="field">
-              <label>Customer ID</label>
+              <label htmlFor="list-customer-id">Customer ID</label>
               <input
+                id="list-customer-id"
                 value={listCustomerId}
                 onChange={(event) => setListCustomerId(event.target.value)}
                 placeholder="c-2001"
               />
             </div>
             <div className="field">
-              <label>Status</label>
-              <select value={listStatus} onChange={(event) => setListStatus(event.target.value)}>
+              <label htmlFor="list-status">Status</label>
+              <select id="list-status" value={listStatus} onChange={(event) => setListStatus(event.target.value)}>
                 <option value="">All</option>
                 {STATUS_OPTIONS.map((status) => (
                   <option key={status} value={status}>
@@ -446,24 +462,27 @@ export default function App() {
               </select>
             </div>
             <div className="field">
-              <label>Updated From</label>
+              <label htmlFor="list-updated-from">Updated From</label>
               <input
+                id="list-updated-from"
                 type="datetime-local"
                 value={listUpdatedFrom}
                 onChange={(event) => setListUpdatedFrom(event.target.value)}
               />
             </div>
             <div className="field">
-              <label>Updated To</label>
+              <label htmlFor="list-updated-to">Updated To</label>
               <input
+                id="list-updated-to"
                 type="datetime-local"
                 value={listUpdatedTo}
                 onChange={(event) => setListUpdatedTo(event.target.value)}
               />
             </div>
             <div className="field">
-              <label>Page</label>
+              <label htmlFor="list-page">Page</label>
               <input
+                id="list-page"
                 type="number"
                 min={0}
                 value={listPage}
@@ -471,8 +490,9 @@ export default function App() {
               />
             </div>
             <div className="field">
-              <label>Size</label>
+              <label htmlFor="list-size">Size</label>
               <input
+                id="list-size"
                 type="number"
                 min={1}
                 max={500}
@@ -481,15 +501,19 @@ export default function App() {
               />
             </div>
             <div className="field">
-              <label>Sort By</label>
-              <select value={listSortBy} onChange={(event) => setListSortBy(event.target.value)}>
+              <label htmlFor="list-sort-by">Sort By</label>
+              <select id="list-sort-by" value={listSortBy} onChange={(event) => setListSortBy(event.target.value)}>
                 <option value="updatedAt">Updated</option>
                 <option value="createdAt">Created</option>
               </select>
             </div>
             <div className="field">
-              <label>Sort Direction</label>
-              <select value={listSortDir} onChange={(event) => setListSortDir(event.target.value)}>
+              <label htmlFor="list-sort-dir">Sort Direction</label>
+              <select
+                id="list-sort-dir"
+                value={listSortDir}
+                onChange={(event) => setListSortDir(event.target.value)}
+              >
                 <option value="desc">Newest first</option>
                 <option value="asc">Oldest first</option>
               </select>
