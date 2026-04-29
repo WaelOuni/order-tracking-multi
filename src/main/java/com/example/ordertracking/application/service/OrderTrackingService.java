@@ -13,6 +13,7 @@ import com.example.ordertracking.application.port.out.SearchOrdersPort;
 import com.example.ordertracking.domain.model.Order;
 import com.example.ordertracking.domain.model.OrderStatus;
 import io.micrometer.observation.annotation.Observed;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -21,6 +22,7 @@ import java.util.List;
 
 @Service
 @Observed(name = "order.tracking.service")
+@RequiredArgsConstructor
 public class OrderTrackingService implements RegisterOrderUseCase, TrackOrderUseCase, UpdateOrderStatusUseCase, ListOrdersUseCase {
 
     private final LoadOrderPort loadOrderPort;
@@ -29,17 +31,6 @@ public class OrderTrackingService implements RegisterOrderUseCase, TrackOrderUse
     private final LoadStaleOrdersPort loadStaleOrdersPort;
     private final SearchOrdersPort searchOrdersPort;
 
-    public OrderTrackingService(LoadOrderPort loadOrderPort,
-                                SaveOrderPort saveOrderPort,
-                                PublishOrderEventPort publishOrderEventPort,
-                                LoadStaleOrdersPort loadStaleOrdersPort,
-                                SearchOrdersPort searchOrdersPort) {
-        this.loadOrderPort = loadOrderPort;
-        this.saveOrderPort = saveOrderPort;
-        this.publishOrderEventPort = publishOrderEventPort;
-        this.loadStaleOrdersPort = loadStaleOrdersPort;
-        this.searchOrdersPort = searchOrdersPort;
-    }
 
     @Override
     public Order register(String orderId, String customerId) {

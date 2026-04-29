@@ -10,6 +10,7 @@ import com.example.ordertracking.application.port.in.UpdateOrderStatusUseCase;
 import com.example.ordertracking.application.port.out.OrderSearchQuery;
 import com.example.ordertracking.domain.model.OrderStatus;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,6 +27,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/orders")
+@RequiredArgsConstructor
 public class OrderTrackingController {
 
     private final RegisterOrderUseCase registerOrderUseCase;
@@ -34,17 +36,6 @@ public class OrderTrackingController {
     private final ListOrdersUseCase listOrdersUseCase;
     private final OrderRestMapper mapper;
 
-    public OrderTrackingController(RegisterOrderUseCase registerOrderUseCase,
-                                   TrackOrderUseCase trackOrderUseCase,
-                                   UpdateOrderStatusUseCase updateOrderStatusUseCase,
-                                   ListOrdersUseCase listOrdersUseCase,
-                                   OrderRestMapper mapper) {
-        this.registerOrderUseCase = registerOrderUseCase;
-        this.trackOrderUseCase = trackOrderUseCase;
-        this.updateOrderStatusUseCase = updateOrderStatusUseCase;
-        this.listOrdersUseCase = listOrdersUseCase;
-        this.mapper = mapper;
-    }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)

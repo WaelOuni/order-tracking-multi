@@ -7,6 +7,7 @@ import com.example.ordertracking.application.port.out.SaveOrderPort;
 import com.example.ordertracking.application.port.out.SearchOrdersPort;
 import com.example.ordertracking.domain.model.Order;
 import com.example.ordertracking.domain.model.OrderStatus;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -18,17 +19,13 @@ import java.util.List;
 import java.util.Optional;
 
 @Component
+@RequiredArgsConstructor
 public class OrderMongoAdapter implements LoadOrderPort, SaveOrderPort, LoadStaleOrdersPort, SearchOrdersPort {
 
     private final SpringDataOrderRepository repository;
     private final OrderDocumentMapper mapper;
     private final MongoTemplate mongoTemplate;
 
-    public OrderMongoAdapter(SpringDataOrderRepository repository, OrderDocumentMapper mapper, MongoTemplate mongoTemplate) {
-        this.repository = repository;
-        this.mapper = mapper;
-        this.mongoTemplate = mongoTemplate;
-    }
 
     @Override
     public Optional<Order> findById(String orderId) {

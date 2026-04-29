@@ -1,31 +1,54 @@
 package com.example.ordertracking.domain.model;
 
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
+
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
+@Getter
+@Accessors(fluent = true)
+@EqualsAndHashCode(of = "id")
+@Builder(toBuilder = true)
 public class Order {
     private final String id;
     private final String customerId;
+    @Setter(AccessLevel.NONE)
     private OrderStatus status;
     private final Instant createdAt;
+    @Setter(AccessLevel.NONE)
     private Instant updatedAt;
-    private final List<TrackingEvent> history;
-
-    public Order(String id, String customerId, OrderStatus status, Instant createdAt, Instant updatedAt, List<TrackingEvent> history) {
-        this.id = id;
-        this.customerId = customerId;
-        this.status = status;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
-        this.history = new ArrayList<>(history);
-    }
+    @Getter(AccessLevel.NONE)
+    @Builder.Default
+    private final List<TrackingEvent> history = new ArrayList<>();
 
     public static Order create(String id, String customerId) {
         Instant now = Instant.now();
         TrackingEvent created = new TrackingEvent(id, OrderStatus.CREATED.name(), now, "Order created");
-        return new Order(id, customerId, OrderStatus.CREATED, now, now, List.of(created));
+        return Order.builder()
+                .id(id)
+                .customerId(customerId)
+                .status(OrderStatus.CREATED)
+                .createdAt(now)
+                .updatedAt(now)
+                .history(new ArrayList<>(List.of(created)))
+                .build();
+    }
+
+    public static Order of(String id, String customerId, OrderStatus status, Instant createdAt, Instant updatedAt, List<TrackingEvent> history) {
+        return Order.builder()
+                .id(id)
+                .customerId(customerId)
+                .status(status)
+                .createdAt(createdAt)
+                .updatedAt(updatedAt)
+                .history(new ArrayList<>(history))
+                .build();
     }
 
     public void transitionTo(OrderStatus target, Instant at, String note) {
@@ -48,16 +71,4 @@ public class Order {
     public Instant updatedAt() { return updatedAt; }
 
     public List<TrackingEvent> history() { return List.copyOf(history); }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Order order)) return false;
-        return Objects.equals(id, order.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
 }

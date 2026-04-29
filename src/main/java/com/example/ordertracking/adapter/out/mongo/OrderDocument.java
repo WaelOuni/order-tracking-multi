@@ -1,5 +1,9 @@
 package com.example.ordertracking.adapter.out.mongo;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -8,6 +12,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Document("orders")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class OrderDocument {
     @Id
     private String id;
@@ -15,18 +23,6 @@ public class OrderDocument {
     private String status;
     private Instant createdAt;
     private Instant updatedAt;
+    @Builder.Default
     private List<TrackingEventDocument> history = new ArrayList<>();
-
-    public String getId() { return id; }
-    public void setId(String id) { this.id = id; }
-    public String getCustomerId() { return customerId; }
-    public void setCustomerId(String customerId) { this.customerId = customerId; }
-    public String getStatus() { return status; }
-    public void setStatus(String status) { this.status = status; }
-    public Instant getCreatedAt() { return createdAt; }
-    public void setCreatedAt(Instant createdAt) { this.createdAt = createdAt; }
-    public Instant getUpdatedAt() { return updatedAt; }
-    public void setUpdatedAt(Instant updatedAt) { this.updatedAt = updatedAt; }
-    public List<TrackingEventDocument> getHistory() { return history; }
-    public void setHistory(List<TrackingEventDocument> history) { this.history = history; }
 }
