@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#12241f">
+    <meta name="description" content="Un atelier pédagogique pour observer des commandes Spring WebFlux, MongoDB et Kafka en temps réel.">
+    <title>Reactive Orders Lab — atelier réactif</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <!-- Les ressources locales fonctionnent avec une CSP stricte, sans CDN ni script inline. -->
+    <link rel="stylesheet" href="/styles.css">
+    <script type="module" src="/app.js"></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#workspace">Aller aux commandes</a>
+    <header class="site-header">
+      <div class="brand"><span class="brand-icon" aria-hidden="true">r.</span><span>Reactive Orders<span class="brand-label">LAB</span></span></div>
+      <span class="environment"><span class="small-dot"></span>Atelier local</span>
+    </header>
+
+    <main>
+      <section class="hero" aria-labelledby="page-title">
+        <div>
+          <p class="eyebrow">APPRENDRE EN OBSERVANT</p>
+          <h1 id="page-title">Une commande.<br><span>Tout un flux.</span></h1>
+          <p class="intro">Crée une commande, suis son événement et explore le réactif en action.</p>
+        </div>
+        <div class="flow-card" aria-label="Parcours de la commande">
+          <p class="flow-caption">LE PARCOURS</p>
+          <ol class="flow">
+            <li><span class="flow-number">01</span><span>API REST<small>WebFlux</small></span></li>
+            <li><span class="flow-number">02</span><span>Commande<small>MongoDB + outbox</small></span></li>
+            <li><span class="flow-number">03</span><span>Événement<small>Kafka → suivi en direct</small></span></li>
+          </ol>
+        </div>
+      </section>
+
+      <div id="notification" class="notification" role="status" aria-live="polite" hidden></div>
+      <div id="workspace" class="workspace">
+        <section class="panel create-panel" aria-labelledby="create-title">
+          <div class="panel-heading"><span class="section-number">01 /</span><h2 id="create-title">Nouvelle commande</h2></div>
+          <p class="panel-description">Un premier événement commence ici.</p>
+          <form id="order-form">
+            <fieldset id="order-fields">
+              <legend class="sr-only">Informations de la commande</legend>
+              <div class="field">
+                <label for="customer-ref">Référence client</label>
+                <input id="customer-ref" name="customerRef" autocomplete="off" placeholder="Ex. CLIENT-001" maxlength="64" required>
+                <span class="field-hint">Une référence fictive suffit pour l’atelier.</span>
+              </div>
+              <div class="field">
+                <label for="sku">Produit</label>
+                <select id="sku" name="sku" required>
+                  <option value="KEYBOARD">Clavier — 69,90 €</option>
+                  <option value="MOUSE">Souris — 29,90 €</option>
+                  <option value="SCREEN">Écran — 249,00 €</option>
+                  <option value="OUT_OF_STOCK">Produit indisponible · tester une erreur</option>
+                </select>
+              </div>
+              <div class="quantity-row">
+                <div class="field quantity-field">
+                  <label for="quantity">Quantité</label>
+                  <input id="quantity" name="quantity" type="number" inputmode="numeric" min="1" max="100" step="1" value="1" required>
+                </div>
+                <div class="estimate"><span>Total estimé</span><output id="estimate" for="sku quantity">69,90 €</output></div>
+              </div>
+              <button id="create-order" class="button primary" type="submit"><span class="button-label">Créer la commande</span><span aria-hidden="true">↗</span></button>
+            </fieldset>
+            <p id="form-error" class="error-message" role="alert" hidden></p>
+          </form>
+          <p class="form-footnote">Le montant final est calculé et validé par le serveur.</p>
+        </section>
+
+        <section class="panel orders-panel" aria-labelledby="orders-title" aria-busy="true" id="orders-section">
+          <div class="orders-heading">
+            <div class="panel-heading"><span class="section-number">02 /</span><h2 id="orders-title">Tes commandes</h2></div>
+            <button id="refresh-orders" class="button subtle" type="button" aria-label="Actualiser les commandes"><span aria-hidden="true">↻</span> Actualiser</button>
+          </div>
+          <p class="panel-description">La commande est enregistrée avant la diffusion de son événement.</p>
+          <div id="orders-error" class="error-message inline-error" role="alert" hidden></div>
+          <div id="orders-loading" class="loading-state" role="status"><span class="spinner" aria-hidden="true"></span>Chargement des commandes…</div>
+          <div id="orders-empty" class="empty-state" hidden>
+            <span class="empty-icon" aria-hidden="true">↗</span><h3>Le flux commence avec toi.</h3><p>Crée ta première commande pour voir les étapes s’enchaîner.</p>
+          </div>
+          <div class="table-scroll" id="orders-table-wrapper" hidden>
+            <table>
+              <caption class="sr-only">Commandes enregistrées, montant, statut et actions</caption>
+              <thead><tr><th scope="col">Commande / client</th><th scope="col">Produit</th><th scope="col">Total</th><th scope="col">Statut</th><th scope="col"><span class="sr-only">Actions</span></th></tr></thead>
+              <tbody id="orders-body"></tbody>
+            </table>
+          </div>
+          <nav class="pagination" aria-label="Pagination des commandes">
+            <span id="page-label" aria-live="polite">Page 1</span>
+            <div><button id="previous-page" class="button pager" type="button" disabled>← Précédente</button><button id="next-page" class="button pager" type="button" disabled>Suivante →</button></div>
+          </nav>
+        </section>
+      </div>
+
+      <section class="panel events-panel" aria-labelledby="events-title">
+        <div class="events-heading">
+          <div><div class="panel-heading"><span class="section-number">03 /</span><h2 id="events-title">Le flux en direct</h2></div><p class="panel-description">Les 20 derniers événements traités. L’arrivée peut prendre quelques secondes.</p></div>
+          <span id="stream-status" class="stream-status" role="status"><span class="small-dot"></span><span id="stream-label">Connexion…</span></span>
+        </div>
+        <div id="events-empty" class="events-empty">En attente d’un événement. Crée ou annule une commande pour observer le flux.</div>
+        <ol id="events-list" class="events-list" aria-label="Derniers événements traités"></ol>
+        <p class="events-footnote">Ce suivi affiche un aperçu actualisé. Après une reconnexion, il reprend les derniers événements disponibles.</p>
+      </section>
+      <footer class="site-footer"><span>Reactive Orders Lab</span><span>Construire · observer · comprendre</span></footer>
+    </main>
+
+    <!-- Des templates inertes évitent de fabriquer du HTML avec des données utilisateur. -->
+    <template id="order-row-template">
+      <tr><td><span class="order-id mono"></span><span class="customer-ref cell-secondary"></span></td><td><span class="product-name"></span><span class="order-quantity cell-secondary"></span></td><td class="order-total mono"></td><td><span class="status-badge"></span></td><td class="action-cell"><button class="button cancel-button" type="button">Annuler</button></td></tr>
+    </template>
+    <template id="event-template">
+      <li class="event-item"><span class="event-dot" aria-hidden="true"></span><div><strong class="event-type"></strong><span class="event-details"></span></div><time class="event-time mono"></time></li>
+    </template>
+  </body>
+</html>

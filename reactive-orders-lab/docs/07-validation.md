@@ -1,0 +1,63 @@
+# Bilan de validation
+
+État initial vérifié le **9 novembre 2026**. Ce fichier distingue le code fourni et les preuves d'exécution. Le statut de la CI du commit courant reste visible dans l'onglet Actions et la pull request du dépôt.
+
+## Exécuté avec succès dans l'environnement de création
+
+- Compilation du code principal et des tests avec **JDK Temurin 21.0.13**, **Maven 3.9.11** et **Spring Boot 4.1.2**.
+- `mvn verify` : **88 tests, 0 échec, 0 erreur, 0 ignoré**.
+- Construction du JAR exécutable et génération du rapport JaCoCo.
+- `npm ci`, vérification de syntaxe JavaScript et découverte des suites Playwright.
+- Validation syntaxique des fichiers YAML, JSON et des scripts Bash.
+
+| Suite Java exécutée | Tests |
+| --- | ---: |
+| OrderTest | 12 |
+| ProductTest | 9 |
+| OrderEventTest | 3 |
+| OrderServiceTest | 18 |
+| OutboxRelayTest | 8 |
+| ReactorLearningTest | 9 |
+| ArchitectureTest | 3 |
+| OrderControllerTest | 14 |
+| WebClientCatalogTest | 7 |
+| KafkaEventPublisherTest | 2 |
+| OrderEventsListenerTest | 3 |
+| **Total** | **88** |
+
+Les tests WebClient utilisent un serveur HTTP local réel, MockWebServer. Les tests du contrôleur lient directement WebTestClient au contrôleur ; ils ne prouvent pas le démarrage de toute l'application. Les tests Kafka unitaires contrôlent la future et la propagation des erreurs avec des doubles de test ; ils ne remplacent pas un broker.
+
+## Fourni et compilé, à exécuter avec infrastructure réelle
+
+`FullStackIT` comprend **7 scénarios** : REST idempotence/annulation, chaîne outbox→Kafka→audit→SSE, rollback de transaction, version optimiste, concurrence des leases, déduplication concurrente et message poison en DLT.
+
+Ces scénarios nécessitent Docker et sont activés par `./mvnw verify -Pintegration`. Docker n'est pas installé dans l'environnement de création ; aucune exécution locale de ces scénarios n'est revendiquée. Le profil ne contient pas de mécanisme `disabledWithoutDocker`.
+
+Playwright fournit **16 scénarios UI isolés** et **1 parcours @live** sans interception d'API. Leur découverte a réussi. Leur lancement local a été bloqué avant les scénarios : Chromium est absent et le téléchargement officiel retourne une page d'indisponibilité au lieu d'une archive. Cela n'est ni un résultat fonctionnel vert ni un défaut démontré du code UI.
+
+## Validation automatisée attendue sur GitHub
+
+Le workflow dédié à ce dossier :
+
+1. Configure Java 21 et Node 24.
+2. Exécute les 88 tests rapides et les 7 tests d'intégration sur Mongo/Kafka Testcontainers.
+3. Installe Chromium et exécute les 16 scénarios UI isolés.
+4. Construit la stack Compose réelle et exécute le scénario navigateur complet.
+5. Conserve les rapports et les diagnostics, puis arrête les conteneurs.
+
+Consulter le résultat réel du workflow avant d'affirmer que l'ensemble est validé. Un fichier de workflow fourni, une suite compilée ou une découverte de tests ne constitue pas une exécution réussie.
+
+## Contrôles de fiabilité intégrés
+
+- Pas de `block()` dans le code de production, vérifié par ArchUnit.
+- Pas d'effet métier avant souscription, testé avec StepVerifier et Mockito.
+- La publication attend l'ack Kafka avant le marquage SENT.
+- Les retries catalogue ignorent les 404 et les erreurs métier ; les tentatives sont bornées.
+- Une clé d'idempotence réutilisée avec un autre contenu est refusée.
+- Une panne d'outbox n'est pas convertie en succès HTTP de création.
+- Les leases épuisés et les échecs durables ne sont pas supprimés par TTL.
+- La précision temporelle est normalisée aux millisecondes avant comparaison BSON.
+
+## Ce que ce bilan ne certifie pas
+
+Ce lab n'a pas fait l'objet d'un test de charge, d'un audit de sécurité, d'un chaos test prolongé, d'un test de cluster Kafka multi-brokers ou d'une qualification de production. Les limites d'authentification, de scaling SSE, de rétention et de reprise opérateur sont décrites dans les guides.

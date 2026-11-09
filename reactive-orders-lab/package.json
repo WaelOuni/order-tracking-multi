@@ -1,0 +1,18 @@
+{
+  "name": "reactive-orders-lab-ui-tests",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Tests navigateur du laboratoire Spring WebFlux ; l'UI reste du JavaScript natif sans build.",
+  "type": "module",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "test:ui": "playwright test",
+    "test:ui:headed": "playwright test --headed",
+    "test:live": "node ui-tests/run-live.mjs",
+    "test:report": "playwright show-report",
+    "serve:ui": "node ui-tests/static-server.mjs"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.65.0"
+  }
+}

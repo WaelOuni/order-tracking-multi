@@ -1,0 +1,8 @@
+{
+  "request": { "method": "GET", "urlPath": "/products/SCREEN" },
+  "response": {
+    "status": 200,
+    "headers": { "Content-Type": "application/json" },
+    "jsonBody": { "sku": "SCREEN", "name": "Écran 27 pouces", "unitPriceCents": 24900, "available": true }
+  }
+}
