@@ -27,11 +27,11 @@
 
 Les tests WebClient utilisent un serveur HTTP local réel, MockWebServer. Les tests du contrôleur lient directement WebTestClient au contrôleur ; ils ne prouvent pas le démarrage de toute l'application. Les tests Kafka unitaires contrôlent la future et la propagation des erreurs avec des doubles de test ; ils ne remplacent pas un broker.
 
-## Fourni et compilé, à exécuter avec infrastructure réelle
+## Suites avec infrastructure réelle
 
 `FullStackIT` comprend **7 scénarios** : REST idempotence/annulation, chaîne outbox→Kafka→audit→SSE, rollback de transaction, version optimiste, concurrence des leases, déduplication concurrente et message poison en DLT.
 
-Ces scénarios nécessitent Docker et sont activés par `./mvnw verify -Pintegration`. Docker n'est pas installé dans l'environnement de création ; aucune exécution locale de ces scénarios n'est revendiquée. Le profil ne contient pas de mécanisme `disabledWithoutDocker`.
+Ces scénarios nécessitent Docker et sont activés par `./mvnw verify -Pintegration`. Docker n’est pas installé dans l’environnement de création ; ils ont été exécutés sur GitHub Actions. Le profil ne contient pas de mécanisme `disabledWithoutDocker`.
 
 Playwright fournit **16 scénarios UI isolés** et **1 parcours @live** sans interception d'API. Leur découverte a réussi. Leur lancement local a été bloqué avant les scénarios : Chromium est absent et le téléchargement officiel retourne une page d'indisponibilité au lieu d'une archive. Cela n'est ni un résultat fonctionnel vert ni un défaut démontré du code UI.
 
@@ -67,6 +67,13 @@ Ce lab n'a pas fait l'objet d'un test de charge, d'un audit de sécurité, d'un 
 
 Le [premier run GitHub](https://github.com/WaelOuni/order-tracking-multi/actions/runs/42647706576) confirme les **88 tests rapides verts**. Le démarrage du conteneur Mongo8.0.26 échoue ensuite à cause de son contrôle de compatibilité du noyau Linux du runner. Cela empêche l'exécution des 7 scénarios réels, et ne constitue pas un échec métier de ces scénarios.
 
-Compose et Testcontainers sont alignés sur Mongo9.0.4, qui contient la correction officielle Ubuntu. Le résultat du nouveau run doit être consulté avant de considérer la stack complète comme validée.
+Compose et Testcontainers sont alignés sur MongoDB 9.0.4, qui contient la correction officielle Ubuntu. Le résultat du nouveau run doit être consulté avant de considérer la stack complète comme validée.
 
-Le [deuxième run](https://github.com/WaelOuni/order-tracking-multi/actions/runs/42648657341) confirme le démarrage de Mongo9.0.4 et de Kafka. Le contexte complet révèle ensuite l'absence de l'auto-configuration `WebClient.Builder`. Le `pom.xml` inclut désormais le starter **spring-boot-starter-webclient**, distinct du starter serveur WebFlux depuis Boot 4. Les tests d'intégration vérifient cet assemblage ; un builder créé à la main ne remplace pas les customizers du framework.
+Le [deuxième run](https://github.com/WaelOuni/order-tracking-multi/actions/runs/42648657341) confirme le démarrage de MongoDB 9.0.4 et de Kafka. Le contexte complet révèle ensuite l'absence de l'auto-configuration `WebClient.Builder`. Le `pom.xml` inclut désormais le starter **spring-boot-starter-webclient**, distinct du starter serveur WebFlux depuis Boot 4. Les tests d'intégration vérifient cet assemblage ; un builder créé à la main ne remplace pas les customizers du framework.
+
+
+## Validation Java et navigateur sur le troisième passage
+
+Le [run 42649234567](https://github.com/WaelOuni/order-tracking-multi/actions/runs/42649234567) valide **88 tests rapides et 7 tests d’intégration, sans échec ni test ignoré**. La transaction réelle, les écritures concurrentes, la chaîne Kafka vers l’audit et SSE et le message poison en DLT sont donc exercés avec MongoDB 9.0.4 et Kafka 4.3.1.
+
+Chromium a également été installé sur le runner : **15 scénarios UI passent**, et le test mobile détecte un débordement horizontal. La mise en page est corrigée puis soumise de nouveau à la même assertion. Le parcours live attend que la suite UI soit verte ; consulter le dernier run pour le résultat complet.
