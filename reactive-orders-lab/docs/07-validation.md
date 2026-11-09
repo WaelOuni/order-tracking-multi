@@ -68,3 +68,5 @@ Ce lab n'a pas fait l'objet d'un test de charge, d'un audit de sécurité, d'un 
 Le [premier run GitHub](https://github.com/WaelOuni/order-tracking-multi/actions/runs/42647706576) confirme les **88 tests rapides verts**. Le démarrage du conteneur Mongo8.0.26 échoue ensuite à cause de son contrôle de compatibilité du noyau Linux du runner. Cela empêche l'exécution des 7 scénarios réels, et ne constitue pas un échec métier de ces scénarios.
 
 Compose et Testcontainers sont alignés sur Mongo9.0.4, qui contient la correction officielle Ubuntu. Le résultat du nouveau run doit être consulté avant de considérer la stack complète comme validée.
+
+Le [deuxième run](https://github.com/WaelOuni/order-tracking-multi/actions/runs/42648657341) confirme le démarrage de Mongo9.0.4 et de Kafka. Le contexte complet révèle ensuite l'absence de l'auto-configuration `WebClient.Builder`. Le `pom.xml` inclut désormais le starter **spring-boot-starter-webclient**, distinct du starter serveur WebFlux depuis Boot 4. Les tests d'intégration vérifient cet assemblage ; un builder créé à la main ne remplace pas les customizers du framework.

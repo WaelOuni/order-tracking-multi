@@ -23,8 +23,11 @@
     <mockwebserver.version>4.12.0</mockwebserver.version>
   </properties>
   <dependencies>
-    <!-- WebFlux fournit Reactor, WebClient et Netty. Pas de starter-web MVC/Servlet dans cette application. -->
+    <!-- WebFlux fournit le serveur réactif et Netty. Pas de starter-web MVC/Servlet dans cette application. -->
     <dependency><groupId>org.springframework.boot</groupId><artifactId>spring-boot-starter-webflux</artifactId></dependency>
+    <!-- Boot 4 sépare le client HTTP du serveur : ce starter configure le WebClient.Builder
+         et ses customizers (codecs, observation). La présence de la classe WebClient ne suffit pas. -->
+    <dependency><groupId>org.springframework.boot</groupId><artifactId>spring-boot-starter-webclient</artifactId></dependency>
     <!-- Le pilote Mongo réactif réalise les I/O sans bloquer les event loops, contrairement au pilote synchrone. -->
     <dependency><groupId>org.springframework.boot</groupId><artifactId>spring-boot-starter-data-mongodb-reactive</artifactId></dependency>
     <!-- Boot 4 a un starter Kafka dédié. Reactor Kafka est arrêté : notre adaptateur isole KafkaProducer.send. -->

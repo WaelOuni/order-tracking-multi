@@ -40,7 +40,8 @@ Le parent **Spring Boot 4.1.2** centralise les versions compatibles de Spring, R
 
 | Dépendance | Rôle précis | Pourquoi ce choix |
 | --- | --- | --- |
-| `spring-boot-starter-webflux` | REST, SSE, WebClient, Reactor/Netty | Serveur HTTP et client HTTP avec I/O non bloquantes |
+| `spring-boot-starter-webflux` | REST, SSE, serveur Reactor/Netty | Serveur HTTP avec I/O non bloquantes |
+| `spring-boot-starter-webclient` | Auto-configuration du WebClient.Builder | Boot 4 sépare le client du serveur ; conserve les customizers et l'observation configurés par Boot |
 | `spring-boot-starter-data-mongodb-reactive` | Template Mongo réactif et mapping | Composer les opérations sans pilote bloquant |
 | `spring-boot-starter-kafka` | Auto-configuration Boot 4, template, listeners | Intégration maintenue ; le pont Reactor est visible dans le code |
 | `spring-boot-starter-validation` | Bean Validation à l'entrée HTTP | Rejeter tôt un payload incorrect ; complète les invariants métier |
