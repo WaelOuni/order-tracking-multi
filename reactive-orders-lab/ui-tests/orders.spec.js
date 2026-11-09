@@ -289,6 +289,24 @@ test('reste utilisable sur mobile et rend les références sans interpréter le 
   await expect(page.locator('.customer-ref')).toHaveText('<script>alert(1)</script>');
   await expect(page.getByRole('button', { name: 'Créer la commande' })).toBeVisible();
   const fits = await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth);
+  if (!fits) {
+    // Le diagnostic complète l'assertion ; il ne masque ni n'ignore un débordement.
+    const layout = await page.evaluate(() => ({
+      viewport: window.innerWidth,
+      documentWidth: document.documentElement.scrollWidth,
+      overflow: [...document.querySelectorAll('body *')].flatMap((element) => {
+        const rect = element.getBoundingClientRect();
+        return rect.right > window.innerWidth + 0.5 && rect.width > 0
+          ? [{ tag: element.tagName, id: element.id, class: element.className, left: rect.left, right: rect.right,
+            width: rect.width, position: getComputedStyle(element).position,
+            container: element.offsetParent?.id || element.offsetParent?.className || element.offsetParent?.tagName }]
+          : [];
+      }),
+    }));
+    console.log('Mobile overflow diagnosis:', JSON.stringify(layout));
+    await test.info().attach('mobile-layout.json', { body: JSON.stringify(layout, null, 2), contentType: 'application/json' });
+    await test.info().attach('mobile-full-page.png', { body: await page.screenshot({ fullPage: true }), contentType: 'image/png' });
+  }
   expect(fits).toBe(true);
   await page.keyboard.press('Tab');
   await expect(page.getByRole('link', { name: 'Aller aux commandes' })).toBeFocused();
