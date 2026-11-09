@@ -1,0 +1,71 @@
+spring:
+  application:
+    name: reactive-orders-lab
+  main:
+    web-application-type: reactive
+  # Boot 4 utilise spring.mongodb.uri, et non l'ancienne clé spring.data.mongodb.uri.
+  mongodb:
+    uri: ${SPRING_MONGODB_URI:mongodb://localhost:27017/reactive_orders?replicaSet=rs0&directConnection=true&serverSelectionTimeoutMS=3000}
+  data:
+    mongodb:
+      auto-index-creation: true # Pratique en lab ; migrations d'index contrôlées en production.
+  http:
+    codecs:
+      max-in-memory-size: 64KB
+  kafka:
+    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      acks: all
+      properties:
+        enable.idempotence: true
+        max.in.flight.requests.per.connection: 5
+        max.block.ms: 2000
+        request.timeout.ms: 5000
+        delivery.timeout.ms: 10000
+    consumer:
+      group-id: reactive-orders-audit-v1
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      enable-auto-commit: false
+      auto-offset-reset: earliest
+      max-poll-records: 20 # Borne les traitements async en vol par poll.
+    listener:
+      concurrency: 1
+      missing-topics-fatal: true
+    admin:
+      fail-fast: true
+server:
+  port: ${SERVER_PORT:8080}
+  shutdown: graceful
+  error:
+    include-stacktrace: never
+    include-message: never
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: never
+      probes:
+        enabled: true
+  info:
+    env:
+      enabled: true
+info:
+  app:
+    purpose: Atelier pédagogique réactif local
+app:
+  catalog:
+    base-url: ${APP_CATALOG_BASE_URL:http://localhost:8089}
+  outbox:
+    enabled: ${APP_OUTBOX_ENABLED:true}
+    poll-delay: 1000
+    batch-size: 20
+    max-attempts: 10
+  kafka:
+    topic: orders.events.v1
+    listener-enabled: ${APP_KAFKA_LISTENER_ENABLED:true}

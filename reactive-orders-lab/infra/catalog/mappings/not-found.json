@@ -1,0 +1,9 @@
+{
+  "priority": 10,
+  "request": { "method": "GET", "urlPathPattern": "/products/.*" },
+  "response": {
+    "status": 404,
+    "headers": { "Content-Type": "application/problem+json" },
+    "jsonBody": { "type": "about:blank", "title": "Produit inconnu", "status": 404, "detail": "Cette référence n'existe pas dans le catalogue pédagogique." }
+  }
+}

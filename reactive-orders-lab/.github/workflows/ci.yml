@@ -1,0 +1,91 @@
+name: Reactive Orders CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+# Le workflow teste du code ; il n'a pas besoin de permission d'écriture.
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      # Tags majeurs vérifiés dans les dépôts officiels des actions. Dependabot
+      # pourra ouvrir les mises à jour ; des SHA immuables peuvent ensuite être fixés.
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Vérifier Docker et Compose
+        run: |
+          docker info
+          docker compose version
+      - name: Tests Java, architecture, BDD et intégration réelle
+        # Le profil explicite exige Docker. Pas de disabledWithoutDocker caché.
+        run: ./mvnw -B -ntp verify -Pintegration
+      - name: Installer les dépendances UI verrouillées
+        run: npm ci
+      - name: Installer Chromium et ses bibliothèques système
+        run: npx playwright install --with-deps chromium
+      - name: Tests UI isolés avec contrats HTTP contrôlés
+        run: npx playwright test --grep-invert @live
+      - name: Conserver le rapport UI isolé avant le prochain lancement
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: ui-isolated-reports
+          path: |
+            playwright-report/
+            test-results/
+          if-no-files-found: warn
+          retention-days: 14
+      - name: Vérifier la configuration Compose
+        run: docker compose config --quiet
+      - name: Construire et démarrer la stack réelle
+        run: docker compose up -d --build --wait --wait-timeout 240
+      - name: Parcours navigateur vers Mongo et Kafka réels
+        env:
+          PLAYWRIGHT_LIVE: '1'
+          PLAYWRIGHT_BASE_URL: http://127.0.0.1:8080
+        run: npx playwright test --grep @live
+      - name: Capturer les diagnostics
+        if: failure()
+        run: |
+          mkdir -p test-results
+          docker compose logs --no-color --tail=300 > test-results/compose.log
+          docker compose ps -a
+      - name: Arrêter la stack même après un échec
+        if: always()
+        # Le runner est éphémère : les volumes de ce run n'ont pas à persister.
+        run: docker compose down --volumes --remove-orphans
+      - name: Conserver les rapports de tests
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: java-and-live-test-reports
+          path: |
+            target/surefire-reports/
+            target/failsafe-reports/
+            target/site/jacoco/
+            target/cucumber-reports/
+            playwright-report/
+            test-results/
+          if-no-files-found: warn
+          retention-days: 14

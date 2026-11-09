@@ -1,0 +1,15 @@
+.git
+.github
+.idea
+.vscode
+.env
+.env.*
+node_modules
+target
+playwright-report
+test-results
+ui-tests
+docs
+*.log
+*.zip
+*.iml

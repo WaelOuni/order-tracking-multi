@@ -1,0 +1,8 @@
+{
+  "request": { "method": "GET", "urlPath": "/products/OUT_OF_STOCK" },
+  "response": {
+    "status": 200,
+    "headers": { "Content-Type": "application/json" },
+    "jsonBody": { "sku": "OUT_OF_STOCK", "name": "Produit indisponible", "unitPriceCents": 1490, "available": false }
+  }
+}

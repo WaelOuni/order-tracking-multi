@@ -1,0 +1,8 @@
+{
+  "request": { "method": "GET", "urlPath": "/products/MOUSE" },
+  "response": {
+    "status": 200,
+    "headers": { "Content-Type": "application/json" },
+    "jsonBody": { "sku": "MOUSE", "name": "Souris sans fil", "unitPriceCents": 2990, "available": true }
+  }
+}

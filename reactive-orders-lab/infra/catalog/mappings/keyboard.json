@@ -1,0 +1,8 @@
+{
+  "request": { "method": "GET", "urlPath": "/products/KEYBOARD" },
+  "response": {
+    "status": 200,
+    "headers": { "Content-Type": "application/json" },
+    "jsonBody": { "sku": "KEYBOARD", "name": "Clavier mécanique", "unitPriceCents": 6990, "available": true }
+  }
+}
