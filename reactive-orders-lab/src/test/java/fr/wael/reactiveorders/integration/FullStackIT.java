@@ -56,8 +56,10 @@ import reactor.test.StepVerifier;
 class FullStackIT {
     private static final Duration WAIT = Duration.ofSeconds(20);
     private static final String TOPIC = "orders.events.v1";
+    // 9.0.4 inclut SERVER-131779 : détection correcte des noyaux Ubuntu corrigés.
+    // Le garde-fou Mongo reste actif ; aucune variable rseq ne le contourne.
     @Container
-    static final MongoDBContainer MONGO = new MongoDBContainer("mongo:8.0.26").withReplicaSet();
+    static final MongoDBContainer MONGO = new MongoDBContainer("mongo:9.0.4").withReplicaSet();
     @Container
     static final KafkaContainer KAFKA = new KafkaContainer("apache/kafka:4.3.1");
     static final MockWebServer CATALOGUE = catalogueServer();

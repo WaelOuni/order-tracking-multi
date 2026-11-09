@@ -5,7 +5,7 @@ name: reactive-orders-lab
 services:
   mongo:
     # Version patch existante, commune au développement et aux tests d'intégration.
-    image: mongo:8.0.26
+    image: mongo:9.0.4
     hostname: mongo
     command: ["mongod", "--replSet", "rs0", "--bind_ip_all"]
     ports:

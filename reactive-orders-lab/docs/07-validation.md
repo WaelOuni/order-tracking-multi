@@ -61,3 +61,10 @@ Consulter le résultat réel du workflow avant d'affirmer que l'ensemble est val
 ## Ce que ce bilan ne certifie pas
 
 Ce lab n'a pas fait l'objet d'un test de charge, d'un audit de sécurité, d'un chaos test prolongé, d'un test de cluster Kafka multi-brokers ou d'une qualification de production. Les limites d'authentification, de scaling SSE, de rétention et de reprise opérateur sont décrites dans les guides.
+
+
+## Premier passage CI et correction d'infrastructure
+
+Le [premier run GitHub](https://github.com/WaelOuni/order-tracking-multi/actions/runs/42647706576) confirme les **88 tests rapides verts**. Le démarrage du conteneur Mongo8.0.26 échoue ensuite à cause de son contrôle de compatibilité du noyau Linux du runner. Cela empêche l'exécution des 7 scénarios réels, et ne constitue pas un échec métier de ces scénarios.
+
+Compose et Testcontainers sont alignés sur Mongo9.0.4, qui contient la correction officielle Ubuntu. Le résultat du nouveau run doit être consulté avant de considérer la stack complète comme validée.

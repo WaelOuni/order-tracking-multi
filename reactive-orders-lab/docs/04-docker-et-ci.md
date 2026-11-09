@@ -7,7 +7,7 @@
 | Service | Image ou construction | Rôle |
 |---|---|---|
 | `app` | `Dockerfile`, Java 21 | WebFlux, API REST, SSE, outbox et consommateur d'audit |
-| `mongo` | `mongo:8.0.26` | Commandes, outbox et audit ; replica set local `rs0` |
+| `mongo` | `mongo:9.0.4` | Commandes, outbox et audit ; replica set local `rs0` |
 | `kafka` | `apache/kafka:4.3.1` | Transport des événements ; mode KRaft |
 | `catalog` | `wiremock/wiremock:3.13.2` | Petite API externe contrôlable pour exercer `WebClient` |
 
@@ -171,10 +171,17 @@ Cette limite concerne l'environnement de vérification ; elle ne transforme pas 
 
 - [MongoDB : transactions et replica sets](https://www.mongodb.com/docs/manual/core/transactions/).
 - [MongoDB 8.0 : notes de version](https://www.mongodb.com/docs/v8.0/release-notes/8.0/).
-- [Image officielle Mongo 8.0.26](https://hub.docker.com/_/mongo/tags?name=8.0.26).
+- [Image officielle Mongo 9.0.4](https://hub.docker.com/_/mongo/tags?name=9.0.4).
 - [Apache Kafka : distributions et images Docker](https://kafka.apache.org/community/downloads/).
 - [Exemples Docker officiels Kafka](https://github.com/apache/kafka/tree/trunk/docker/examples).
 - [WireMock : exécution Docker](https://wiremock.org/docs/standalone/docker/).
 - [WireMock Docker : sonde intégrée](https://github.com/wiremock/wiremock-docker).
 - [Propriétés Spring Boot, notamment `spring.mongodb.uri`](https://docs.spring.io/spring-boot/appendix/application-properties/index.html).
 - [Actions officielles : checkout](https://github.com/actions/checkout), [Java](https://github.com/actions/setup-java), [Node](https://github.com/actions/setup-node), [artefacts](https://github.com/actions/upload-artifact).
+
+
+## Compatibilité du noyau Linux et version Mongo
+
+La première CI a détecté l'incompatibilité de Mongo8.0.26 avec le noyau `7.0.0-1017-azure` du runner Ubuntu24.04.5. Ce projet neuf utilise donc l'image officielle **mongo:9.0.4**, également fixée dans les tests d'intégration. Cette version inclut la correction de détection des noyaux Ubuntu dans [SERVER-131779](https://jira.mongodb.org/browse/SERVER-131779). Aucune donnée utilisateur n'a été migrée et aucune protection de démarrage n'est désactivée.
+
+La [note officielle Mongo](https://www.mongodb.com/docs/manual/release-notes/9.0/) reste la référence pour la compatibilité de l'hôte. Un conteneur partage le noyau Linux de son hôte : changer de distribution dans une image ne change pas ce noyau. Si ton environnement possède un noyau affecté, utiliser un noyau pris en charge plutôt que contourner le contrôle.
